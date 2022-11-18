@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState, useEffect } from "react";
 import PolygonAnnotation from "components/PolygonAnnotation";
 import { Stage, Layer, Image } from "react-konva";
 import Button from "components/Button";
+import ExportModal from "components/ExportModal";
 const videoSource = "https://wallpaper.dog/large/20471384.png";
 const wrapperStyle = {
     display: "flex",
@@ -21,12 +22,13 @@ const Canvas = () => {
     const [image, setImage] = useState();
     const imageRef = useRef(null);
     const dataRef = useRef(null);
-    const [points, setPoints] = useState([]);
+    const [maps, setMaps] = useState([{ _id: (new Date()).getTime()+"", points: [], flattenedPoints: [], isFinished: false, edit: true ,link:"",target:"",title:""}]);
     const [size, setSize] = useState({});
     const [flattenedPoints, setFlattenedPoints] = useState();
     const [position, setPosition] = useState([0, 0]);
     const [isMouseOverPoint, setMouseOverPoint] = useState(false);
-    const [isPolyComplete, setPolyComplete] = useState(false);
+    const [displayModal, setDisplayModal] = useState(false);
+    // const [isFinished, setPolyComplete] = useState(false);
     const videoElement = useMemo(() => {
         const element = new window.Image();
         // element.width = 650;
@@ -36,7 +38,7 @@ const Canvas = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [videoSource]); //it may come from redux so it may be dependency that's why I left it as dependecny...
     useEffect(() => {
-
+        console.log();
         setSize({
             width: videoElement.width,
             height: videoElement.height,
@@ -44,20 +46,67 @@ const Canvas = () => {
         setImage(videoElement);
         imageRef.current = videoElement;
 
+        setState({
+            stageScale: 1200 / videoElement.width,
+            stageX: 0,
+            stageY: 0,
+            height: videoElement.height * 1200 / videoElement.width,
+        })
+
 
     }, [videoElement]);
     const getMousePos = (stage) => {
-        return [(stage.getPointerPosition().x - state.stageX) / state.stageScale, (stage.getPointerPosition().y - state.stageY) / state.stageScale];
+        return [Math.round(Number((stage.getPointerPosition().x - state.stageX) / state.stageScale)), Math.round(Number((stage.getPointerPosition().y - state.stageY) / state.stageScale))];
     };
     //drawing begins when mousedown event fires.
     const handleMouseDown = (e) => {
-        if (isPolyComplete) return;
+
         const stage = e.target.getStage();
         const mousePos = getMousePos(stage);
-        if (isMouseOverPoint && points.length >= 3) {
-            setPolyComplete(true);
+        let imap
+        maps.forEach(map => {
+            if (!map.isFinished) {
+                imap = map
+            } else return
+        });
+
+
+        if (imap == undefined || isMouseOverPoint) {
+            return
+        }
+        console.log("1");
+        if (imap.isFinished) return;
+        if (isMouseOverPoint && imap.points.length >= 3) {
+            let rs = []
+            maps.forEach(map => {
+                if (map?._id == imap?._id) {
+                    rs.push({
+                        ...imap,
+                        isFinished: true
+                    })
+                } else {
+                    rs.push(map)
+                }
+            });
+            setMaps(rs);
         } else {
-            setPoints([...points, mousePos]);
+            let rs = []
+            maps.forEach(map => {
+                if (map?._id == imap?._id) {
+                   
+                    let p = [...imap.points, mousePos]
+                    rs.push({
+                        ...imap,
+                        points: p,
+                        flattenedPoints: p.concat(imap.isFinished ? [] : position).reduce((a, b) => a.concat(b), [])
+                    })
+                } else {
+                    rs.push(map)
+                }
+            });
+
+            setMaps(rs);
+
         }
     };
     const handleMouseMove = (e) => {
@@ -65,67 +114,61 @@ const Canvas = () => {
         const mousePos = getMousePos(stage);
         setPosition(mousePos);
     };
-    const handleMouseOverStartPoint = (e) => {
-        console.log("3");
-        if (isPolyComplete || points.length < 3) return;
-        e.target.scale({ x: 3, y: 3 });
-        setMouseOverPoint(true);
-    };
-    const handleMouseOutStartPoint = (e) => {
-        console.log("4");
-        e.target.scale({ x: 1, y: 1 });
-        setMouseOverPoint(false);
-    };
-    const handlePointDragMove = (e) => {
-        console.log("5");
-        const stage = e.target.getStage();
-        const index = e.target.index - 1;
-        // console.log(stage);
 
-        const pos = [(e.target._lastPos.x - state.stageX) / state.stageScale, (e.target._lastPos.y - state.stageY) / state.stageScale];
-        // if (pos[0] < 0) pos[0] = 0;
-        // if (pos[1] < 0) pos[1] = 0;
-        // if (pos[0] > stage.width()) pos[0] = stage.width();
-        // if (pos[1] > stage.height()) pos[1] = stage.height();
-        setPoints([...points.slice(0, index), pos, ...points.slice(index + 1)]);
-    };
-    useEffect(() => {
-        setFlattenedPoints(
-            points
-                .concat(isPolyComplete ? [] : position)
-                .reduce((a, b) => a.concat(b), [])
-        );
-    }, [points, isPolyComplete, position]);
-    const handleGroupDragEnd = (e) => {
-        //drag end listens other children circles' drag end event
-        //...that's, why 'name' attr is added, see in polygon annotation part
-        if (e.target.name() === "polygon") {
-            let result = [];
-            let copyPoints = [...points];
-
-            copyPoints.map((point) =>
-                result.push([point[0] + e.target.x(), point[1] + e.target.y()])
-            );
-            e.target.position({ x: 0, y: 0 }); //needs for mouse position otherwise when click undo you will see that mouse click position is not normal:)
-            setPoints(result);
-        }
-    };
 
 
     const undo = () => {
-        setPoints(points.slice(0, -1));
-        setPolyComplete(false);
-        setPosition(points[points.length - 1]);
+        // setPoints(points.slice(0, -1));
+        // setPolyComplete(false);
+        // setPosition(points[points.length - 1]);
+    };
+    const addMap = () => {
+        let rs = []
+        maps.forEach(map => {
+            rs.push({ ...map, isFinished: true, edit: false })
+        });
+        setMaps([...rs, { _id: (new Date()).getTime()+"", points: [], flattenedPoints: [], isFinished: false, edit: true ,link:"",target:"",title:""}])
+    };
+    const edit = (_id) => {
+
+        let rs = []
+        let item
+        maps.forEach(map => {
+            if (_id == map._id) {
+                item = { ...map, isFinished: false, edit: true }
+            } else rs.push({ ...map, isFinished: true, edit: false })
+        });
+        rs.push(item)
+        setMaps(rs)
+    };
+    const deleteMap = (_id) => {
+        let rs = []
+        maps.forEach(map => {
+            if (_id != map._id) {
+                rs.push({ ...map, isFinished: true, edit: false })
+            }  
+        });
+        setMaps(rs)
     };
     const reset = () => {
-        setPoints([]);
-        setPolyComplete(false);
+        setMaps([{ _id: "1111", points: [], flattenedPoints: [], isFinished: false, edit: true }]);
+        // setPolyComplete(false);
+    };
+    const exportMap = () => {
+        setDisplayModal(true)
     };
     const [state, setState] = useState({
-        stageScale: 1,
+        stageScale: 0.6,
         stageX: 0,
-        stageY: 0
+        stageY: 0,
+        height: 500
     });
+    function sortMaps() {
+        let list =[...maps]
+        list.sort((a, b) => a._id- b._id);
+        return list.reverse()
+    }
+    //zoom
     const handleWheel = (e) => {
         e.evt.preventDefault();
 
@@ -138,26 +181,61 @@ const Canvas = () => {
         };
 
         const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-        setState({
-            stageScale: newScale,
-            stageX:
-                -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-            stageY:
-                -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale
-        });
+        if (newScale > (1200 / videoElement.width)) {
+            setState({
+                stageScale: newScale,
+                stageX: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+                stageY: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
+                height: state.height,
+            });
+        } else {
+            setState({
+                stageScale: 1200 / videoElement.width,
+                stageX: 0,
+                stageY: 0,
+                height: state.height,
+            });
+        }
+
     };
+    function onChange(e,id,arr) {
+        let rs=[]
+        maps.forEach(map => {
+            if(map._id==id){
+                let newMap=map;
+                if(arr=="link"){
+                    newMap.link=e.target.value
+                }else if(arr=="title"){
+                    newMap.title=e.target.value
+                }else if(arr=="target"){
+                    if(e.target.value!="null"){
+                        newMap.target=e.target.value
+                    }
+                   
+                }
+                rs.push(newMap)
+            }else {
+                rs.push(map)
+            }
+        });
+        setMaps(rs);
+        // console.log(e.target.value);
+    }
 
 
     return (
+
         <div>
+            {displayModal && <ExportModal maps={maps} setDisplay={setDisplayModal} />}
             <div style={wrapperStyle}>
                 <div style={columnStyle}>
                     <Stage
                         width={1200}
-                        height={550}
+                        height={state.height}
                         onMouseMove={handleMouseMove}
-                        onMouseDown={handleMouseDown}
+                        onMouseUp={handleMouseDown}
                         onWheel={handleWheel}
+
                         scaleX={state.stageScale}
                         scaleY={state.stageScale}
                         x={state.stageX}
@@ -175,15 +253,22 @@ const Canvas = () => {
                                 width={size.width}
                                 height={size.height}
                             />
-                            <PolygonAnnotation
-                                points={points}
-                                flattenedPoints={flattenedPoints}
-                                handlePointDragMove={handlePointDragMove}
-                                handleGroupDragEnd={handleGroupDragEnd}
-                                handleMouseOverStartPoint={handleMouseOverStartPoint}
-                                handleMouseOutStartPoint={handleMouseOutStartPoint}
-                                isFinished={isPolyComplete}
-                            />
+                            {maps.map((imap, index) =>
+                                <PolygonAnnotation
+                                    position={position}
+                                    key={imap._id}
+                                    points={imap.points}
+                                    imap={imap}
+                                    indexMap={index}
+                                    state={state}
+                                    listMap={maps}
+
+                                    setMaps={setMaps}
+                                    setMouseOverPoint={setMouseOverPoint}
+                                    flattenedPoints={imap.flattenedPoints}
+                                    isFinished={imap.isFinished}
+                                    edit={imap.edit}
+                                />)}
                         </Layer>
                     </Stage>
 
@@ -197,8 +282,11 @@ const Canvas = () => {
                     alignItems: "center",
                 }}
             >
-                <Button name="Undo" onClick={undo} />
-                <Button name="Reset" onClick={reset} />
+                {/* <Button name="Undo" onClick={undo} /> */}
+                <Button name="Add" onClick={addMap} />
+                <Button name="Export" onClick={exportMap} />
+                &emsp;|&emsp;
+                <Button name="RESET" onClick={reset} />
             </div>
             <div
 
@@ -212,16 +300,62 @@ const Canvas = () => {
                     ref={dataRef}
                     style={{
                         width: 1200,
-                        height: 302,
-                        border:"1px solid gray"
-                        
-                       
+                        marginBottom: 10,
+                        border: "1px solid gray",
+                        overflowY:"scroll",
+                        maxHeight:300
                     }}
                 >
-                    <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(position)}</pre>
-                    <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(points)
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th>Active</th>
+                                <th>Shape</th>
+                                <th>Link</th>
+                                <th>Title</th>
+                                <th>Target</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sortMaps().map((imap, index) =>
+                                <tr key={imap._id}>
+                                    <td> <button className={!imap.isFinished?"btn btn-primary":"btn btn-outline-primary"} onClick={(e) => edit(imap._id)} >{index + 1}</button></td>
+                                    <td>
+                                        <select className="form-select"defaultValue={"poly"} aria-label="Default select example">
+                                            {/* <option selected value="">...</option> */}
+                                            <option  value="poly">Poly</option>
+                                            {/* <option value="2">Two</option>
+                                            <option value="3">Three</option> */}
+                                        </select>
+                                    </td>
+                                    <td> <input type="text" className="form-control" onChange={(e)=>{onChange(e,imap._id,"link")}}/></td>
+                                    <td> <input type="text" className="form-control"  onChange={(e)=>{onChange(e,imap._id,"title")}}/></td>
+                                    <td> 
+                                        <select className="form-select" defaultValue={"null"} aria-label="Default select example" onChange={(e)=>{onChange(e,imap._id,"target")}}>
+                                            <option value="null">...</option>
+                                            <option value="_blank">_blank</option>
+                                            <option value="_parent">_parent</option>
+                                            <option value="_seft">_seft</option>
+                                            <option value="_top">_top</option>
+                                        </select>
+                                        </td>
+                                        <td> 
+                                        <button className="btn btn-outline-danger" onClick={(e) => deleteMap(imap._id)} >✖</button>
+                                        </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+
+                    <div >
+
+                    </div>
+
+                    {/* <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(position)}</pre>
+                    <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(maps)
                         // .replaceAll('[',"").replaceAll("]","")
-                    }</pre>
+                    }</pre> */}
                 </div>
             </div>
         </div>

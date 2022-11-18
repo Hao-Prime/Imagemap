@@ -1,0 +1,184 @@
+.modal{
+  background-color: #414141f0 !important;
+}
+.modal-body{
+  padding: 15px 10px 15px 25px !important;
+}
+.modalBackground {
+  width: 100%;
+  height: auto;
+  background-color: rgba(200, 200, 200);
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.widget-container {
+    display: flex;
+}
+
+.widget-container > * {
+    height: 400px;
+    width: 50%;
+    padding: 10px;
+}
+
+.modalContainer {
+  width: 500px;
+  height: 500px;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+}
+.modal-footer{
+  padding:3px 31px 5px 31px !important;
+}
+.modalContainer .title {
+  display: inline-block;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.titleCloseBtn {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.titleCloseBtn button {
+  background-color: transparent;
+  border: none;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.modalContainer .body {
+  flex: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.7rem;
+  text-align: center;
+}
+
+.modalContainer .footer {
+  flex: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalContainer .footer button {
+  width: 150px;
+  height: 45px;
+  margin: 10px;
+  border: none;
+  background-color: cornflowerblue;
+  color: white;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#cancelBtn {
+  background-color: crimson;
+}
+h5{
+  margin-bottom:10px;
+}
+.form-check-input{
+  margin-left: 0 !important;
+}
+.ReactModal__Overlay{
+  background-color: none !important;
+}
+.input-c{
+  margin: 10px 0px 0px 0px !important;
+
+}
+.input-c2{
+  padding: 10px 0px 0px 7px !important;
+
+}
+.text-right{
+  white-space: nowrap;
+  float: right;
+  padding-top: 18px;
+  text-align: right;
+  /* padding-right: 8px; */
+}
+.text-right-da-ct{
+  white-space: nowrap;
+  text-align: right;
+  padding-right: 8px;
+  width: 120px;
+  vertical-align: initial;
+}
+
+.text-left{
+  white-space: nowrap;
+  float: left;
+  padding-top: 15px;
+  text-align: left;
+}
+.text-right2{
+  white-space: nowrap;
+  float: right;
+  text-align: right;
+  padding-right: 8px;
+}
+.text-right-ctcv-damnhiem{
+  white-space: nowrap;
+  text-align: right;
+  padding-right: 8px;
+}
+.componentWrapper {
+  width: 100%;
+  border: 1px solid #939393;
+  border-radius: 10px;
+  margin: 0px 30px 10px 7px;
+  padding: 29px 13px 10px 20px;
+
+}
+
+.componentWrapper .header {
+  position: absolute;
+  margin-top: -40px;
+  margin-left: 10px;
+  width: auto;
+  color: black;
+  background: #ffffff;
+  border-radius: -147px;
+  padding: 2px 10px;
+}
+
+.form-select{
+font-size: 13px !important;
+}.table-ctcv-llv td{
+  height: 35px !important;
+}
+.dx-list-item-before-bag{
+  vertical-align: initial !important;
+}
+.dx-widget {
+  margin-bottom: -7px !important;
+}.ReactModal__Overlay{
+  z-index: 2000;
+}.input-them-nhatky{
+  padding-top: 9px !important;
+}
+.div-nhatky-pane .Pane2{
+  overflow: hidden;
+}
+.div-nhatky .dx-scrollable-wrapper{
+  overflow-y: scroll;
+  max-height: 380px;
+}
+.mtedit{
+  margin-top: 9px;
+}.btn-close{
+  background: unset;
+  border: unset;
+}
