@@ -3,58 +3,55 @@ import PolygonAnnotation from "components/PolygonAnnotation";
 import { Stage, Layer, Image } from "react-konva";
 import Button from "components/Button";
 import ExportModal from "components/ExportModal";
-const videoSource = "https://wallpaper.dog/large/20471384.png";
-const wrapperStyle = {
-    display: "flex",
-    justifyContent: "center",
-    marginTop: 20,
-    // backgroundColor: "aliceblue",
-};
-const columnStyle = {
-    display: "flex",
-    justifyContent: "center",
-    flexDirection: "column",
-    alignItems: "center",
-    // marginTop: 20,
-    backgroundColor: "#e8e8e8",
-};
+
+
+
 const Canvas = () => {
     const [image, setImage] = useState();
     const imageRef = useRef(null);
     const dataRef = useRef(null);
-    const [maps, setMaps] = useState([{ _id: (new Date()).getTime()+"", points: [], flattenedPoints: [], isFinished: false, edit: true ,link:"",target:"",title:""}]);
+    const [maps, setMaps] = useState([{ _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", target: "", title: "" }]);
+    const [history, setHistory] = useState([maps]);
     const [size, setSize] = useState({});
+    const [changePoint, setChangePoint] = useState(false);
     const [flattenedPoints, setFlattenedPoints] = useState();
     const [position, setPosition] = useState([0, 0]);
     const [isMouseOverPoint, setMouseOverPoint] = useState(false);
     const [displayModal, setDisplayModal] = useState(false);
+
+    const [picture, setPicture] = useState(null);
     // const [isFinished, setPolyComplete] = useState(false);
     const videoElement = useMemo(() => {
         const element = new window.Image();
         // element.width = 650;
         // element.height = 302;
-        element.src = videoSource;
+
+        if (picture != null) {
+            element.src = picture;
+        } else element.src = window.location.href + "default.jpg";
+
+        console.log(  element.src);
         return element;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [videoSource]); //it may come from redux so it may be dependency that's why I left it as dependecny...
+    }, [picture]); //it may come from redux so it may be dependency that's why I left it as dependecny...
+
     useEffect(() => {
-        console.log();
+        
         setSize({
             width: videoElement.width,
             height: videoElement.height,
         });
         setImage(videoElement);
         imageRef.current = videoElement;
-
         setState({
-            stageScale: 1200 / videoElement.width,
+            stageScale: 1000 / videoElement.width,
             stageX: 0,
             stageY: 0,
-            height: videoElement.height * 1200 / videoElement.width,
+            height: videoElement.height * 1000 / videoElement.width,
         })
 
-
     }, [videoElement]);
+
     const getMousePos = (stage) => {
         return [Math.round(Number((stage.getPointerPosition().x - state.stageX) / state.stageScale)), Math.round(Number((stage.getPointerPosition().y - state.stageY) / state.stageScale))];
     };
@@ -93,7 +90,7 @@ const Canvas = () => {
             let rs = []
             maps.forEach(map => {
                 if (map?._id == imap?._id) {
-                   
+
                     let p = [...imap.points, mousePos]
                     rs.push({
                         ...imap,
@@ -116,18 +113,24 @@ const Canvas = () => {
     };
 
 
-
+    useEffect(() => {
+        if (!history.includes(maps) && !changePoint) {
+            setHistory([...history, maps])
+        }
+    }, [maps]);
     const undo = () => {
-        // setPoints(points.slice(0, -1));
-        // setPolyComplete(false);
-        // setPosition(points[points.length - 1]);
+        if (history.length > 1) {
+            setMaps(history[history.length - 2])
+        }
+        setHistory([...history.slice(0, history.length - 1)])
+
     };
     const addMap = () => {
         let rs = []
         maps.forEach(map => {
             rs.push({ ...map, isFinished: true, edit: false })
         });
-        setMaps([...rs, { _id: (new Date()).getTime()+"", points: [], flattenedPoints: [], isFinished: false, edit: true ,link:"",target:"",title:""}])
+        setMaps([...rs, { _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", target: "", title: "" }])
     };
     const edit = (_id) => {
 
@@ -146,12 +149,12 @@ const Canvas = () => {
         maps.forEach(map => {
             if (_id != map._id) {
                 rs.push({ ...map, isFinished: true, edit: false })
-            }  
+            }
         });
         setMaps(rs)
     };
     const reset = () => {
-        setMaps([{ _id: "1111", points: [], flattenedPoints: [], isFinished: false, edit: true }]);
+        setMaps([{ _id: "1111", points: [], flattenedPoints: [], isFinished: false, edit: true , link: "", target: "", title: ""}]);
         // setPolyComplete(false);
     };
     const exportMap = () => {
@@ -164,8 +167,8 @@ const Canvas = () => {
         height: 500
     });
     function sortMaps() {
-        let list =[...maps]
-        list.sort((a, b) => a._id- b._id);
+        let list = [...maps]
+        list.sort((a, b) => a._id - b._id);
         return list.reverse()
     }
     //zoom
@@ -181,7 +184,7 @@ const Canvas = () => {
         };
 
         const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-        if (newScale > (1200 / videoElement.width)) {
+        if (newScale > (1000 / videoElement.width)) {
             setState({
                 stageScale: newScale,
                 stageX: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
@@ -190,7 +193,7 @@ const Canvas = () => {
             });
         } else {
             setState({
-                stageScale: 1200 / videoElement.width,
+                stageScale: 1000 / videoElement.width,
                 stageX: 0,
                 stageY: 0,
                 height: state.height,
@@ -198,167 +201,194 @@ const Canvas = () => {
         }
 
     };
-    function onChange(e,id,arr) {
-        let rs=[]
+    function onChange(e, id, arr) {
+        let rs = []
         maps.forEach(map => {
-            if(map._id==id){
-                let newMap=map;
-                if(arr=="link"){
-                    newMap.link=e.target.value
-                }else if(arr=="title"){
-                    newMap.title=e.target.value
-                }else if(arr=="target"){
-                    if(e.target.value!="null"){
-                        newMap.target=e.target.value
+            if (map._id == id) {
+                let newMap = map;
+                console.log(e.target.value);
+                if (arr == "link") {
+                    newMap.link = e.target.value
+                } else if (arr == "title") {
+                    newMap.title = e.target.value
+                } else if (arr == "target") {
+                    if (e.target.value != "null") {
+                        newMap.target = e.target.value
                     }
-                   
+
                 }
                 rs.push(newMap)
-            }else {
+            } else {
                 rs.push(map)
             }
         });
         setMaps(rs);
         // console.log(e.target.value);
     }
+    function saveFile(file) {
 
+        getBase64(file).then(base64 => {
+            setPicture(base64);
+
+        });
+
+
+
+    }
+    const getBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
 
     return (
+        <>
 
-        <div>
-            {displayModal && <ExportModal maps={maps} setDisplay={setDisplayModal} />}
-            <div style={wrapperStyle}>
-                <div style={columnStyle}>
-                    <Stage
-                        width={1200}
-                        height={state.height}
-                        onMouseMove={handleMouseMove}
-                        onMouseUp={handleMouseDown}
-                        onWheel={handleWheel}
+            <div>
+                {displayModal && <ExportModal maps={maps} setDisplay={setDisplayModal} />}
+                <div  className="wrapperStyle">
+                    {picture==null&&<input type="file" className="form-control form-control-lg input-picture" name="tenDA"
+                            onChange={(e) => { saveFile(e.target.files[0]) }} placeholder=""
+                            accept=".jpg, .jpeg, .png,"
+                        />}
+                    </div>
 
-                        scaleX={state.stageScale}
-                        scaleY={state.stageScale}
-                        x={state.stageX}
-                        y={state.stageY}
+                <div className="wrapperStyle">
+                    
+                    <div className="columnStyle">
+                        <Stage
+                            width={1000}
+                            height={state.height}
+                            onMouseMove={handleMouseMove}
+                            onMouseUp={handleMouseDown}
+                            onWheel={handleWheel}
+                            
+                            scaleX={state.stageScale}
+                            scaleY={state.stageScale}
+                            x={state.stageX}
+                            y={state.stageY}
 
-                    >
-                        <Layer>
-
-
-                            <Image
-                                ref={imageRef}
-                                image={image}
-                                x={0}
-                                y={0}
-                                width={size.width}
-                                height={size.height}
-                            />
-                            {maps.map((imap, index) =>
-                                <PolygonAnnotation
-                                    position={position}
-                                    key={imap._id}
-                                    points={imap.points}
-                                    imap={imap}
-                                    indexMap={index}
-                                    state={state}
-                                    listMap={maps}
-
-                                    setMaps={setMaps}
-                                    setMouseOverPoint={setMouseOverPoint}
-                                    flattenedPoints={imap.flattenedPoints}
-                                    isFinished={imap.isFinished}
-                                    edit={imap.edit}
-                                />)}
-                        </Layer>
-                    </Stage>
-
-                </div>
-
-            </div>
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
-                {/* <Button name="Undo" onClick={undo} /> */}
-                <Button name="Add" onClick={addMap} />
-                <Button name="Export" onClick={exportMap} />
-                &emsp;|&emsp;
-                <Button name="RESET" onClick={reset} />
-            </div>
-            <div
-
-                style={{
-
-                    display: "flex",
-                    justifyContent: "center",
-                }}
-            >
-                <div
-                    ref={dataRef}
-                    style={{
-                        width: 1200,
-                        marginBottom: 10,
-                        border: "1px solid gray",
-                        overflowY:"scroll",
-                        maxHeight:300
-                    }}
-                >
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>Active</th>
-                                <th>Shape</th>
-                                <th>Link</th>
-                                <th>Title</th>
-                                <th>Target</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sortMaps().map((imap, index) =>
-                                <tr key={imap._id}>
-                                    <td> <button className={!imap.isFinished?"btn btn-primary":"btn btn-outline-primary"} onClick={(e) => edit(imap._id)} >{index + 1}</button></td>
-                                    <td>
-                                        <select className="form-select"defaultValue={"poly"} aria-label="Default select example">
-                                            {/* <option selected value="">...</option> */}
-                                            <option  value="poly">Poly</option>
-                                            {/* <option value="2">Two</option>
-                                            <option value="3">Three</option> */}
-                                        </select>
-                                    </td>
-                                    <td> <input type="text" className="form-control" onChange={(e)=>{onChange(e,imap._id,"link")}}/></td>
-                                    <td> <input type="text" className="form-control"  onChange={(e)=>{onChange(e,imap._id,"title")}}/></td>
-                                    <td> 
-                                        <select className="form-select" defaultValue={"null"} aria-label="Default select example" onChange={(e)=>{onChange(e,imap._id,"target")}}>
-                                            <option value="null">...</option>
-                                            <option value="_blank">_blank</option>
-                                            <option value="_parent">_parent</option>
-                                            <option value="_seft">_seft</option>
-                                            <option value="_top">_top</option>
-                                        </select>
-                                        </td>
-                                        <td> 
-                                        <button className="btn btn-outline-danger" onClick={(e) => deleteMap(imap._id)} >✖</button>
-                                        </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-
-                    <div >
+                        >
+                            <Layer>
+                                <Image
+                                    ref={imageRef}
+                                    image={image}
+                                    x={0}
+                                    y={0}
+                                    width={size.width}
+                                    height={size.height}
+                                />
+                                {maps.map((imap, index) =>
+                                    <PolygonAnnotation
+                                        position={position}
+                                        key={imap._id}
+                                        points={imap.points}
+                                        imap={imap}
+                                        indexMap={index}
+                                        state={state}
+                                        listMap={maps}
+                                        setChangePoint={setChangePoint}
+                                        setMaps={setMaps}
+                                        setMouseOverPoint={setMouseOverPoint}
+                                        flattenedPoints={imap.flattenedPoints}
+                                        isFinished={imap.isFinished}
+                                        edit={imap.edit}
+                                    />)}
+                            </Layer>
+                        </Stage>
 
                     </div>
 
-                    {/* <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(position)}</pre>
+                </div>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}
+                >
+                    {/* <Button name="Undo" onClick={undo} /> */}
+                    <Button name="Add" onClick={addMap} />
+                    <Button name="Undo" onClick={undo} />
+                    <Button name="Export" onClick={exportMap} />
+                    &emsp;|&emsp;
+                    <Button name="RESET" onClick={reset} />
+                </div>
+                <div
+
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    <div
+                        ref={dataRef}
+                        style={{
+                            width: 1000,
+                            marginBottom: 10,
+                            border: "1px solid gray",
+                            overflowY: "scroll",
+                            maxHeight: 300
+                        }}
+                    >
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>Active</th>
+                                    <th>Shape</th>
+                                    <th>Link</th>
+                                    <th>Title</th>
+                                    <th>Target</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {sortMaps().map((imap, index) =>
+                                    <tr key={imap._id}>
+                                        <td> <button className={!imap.isFinished ? "btn btn-primary" : "btn btn-outline-primary"} onClick={(e) => edit(imap._id)} >{maps.length - (index)}</button></td>
+                                        <td>
+                                            <select className="form-select" defaultValue={"poly"} aria-label="Default select example">
+                                                {/* <option selected value="">...</option> */}
+                                                <option value="poly">Poly</option>
+                                                {/* <option value="2">Two</option>
+                                            <option value="3">Three</option> */}
+                                            </select>
+                                        </td>
+                                        <td> <input type="text" defaultValue={imap.link} className="form-control" onChange={(e) => { onChange(e, imap._id, "link") }} /></td>
+                                        <td> <input type="text" defaultValue={imap.title} className="form-control" onChange={(e) => { onChange(e, imap._id, "title") }} /></td>
+                                        <td>
+                                            <select className="form-select" defaultValue={imap.target=""?"null":imap.target} aria-label="Default select example" onChange={(e) => { onChange(e, imap._id, "target") }}>
+                                                <option value="null">...</option>
+                                                <option value="_blank">_blank</option>
+                                                <option value="_parent">_parent</option>
+                                                <option value="_seft">_seft</option>
+                                                <option value="_top">_top</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button className="btn btn-outline-danger" onClick={(e) => deleteMap(imap._id)} ><b>✖</b></button>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+
+                        <div >
+
+                        </div>
+
+                        {/* <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(position)}</pre>
                     <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(maps)
                         // .replaceAll('[',"").replaceAll("]","")
                     }</pre> */}
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
+
     );
 };
 

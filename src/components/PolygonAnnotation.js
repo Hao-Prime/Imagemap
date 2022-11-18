@@ -1,4 +1,4 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Line, Circle, Group } from "react-konva";
 import { minMax, dragBoundFunc } from "utils";
 /**
@@ -23,6 +23,7 @@ const PolygonAnnotation = (props) => {
         listMap,
         indexMap,
         edit,
+        setChangePoint,
         setMouseOverPoint
     } = props;
     const vertexRadius = 6;
@@ -46,7 +47,7 @@ const PolygonAnnotation = (props) => {
         // setMinMaxX(minMax(arrX));
         // setMinMaxY(minMax(arrY));
         setMouseOverPoint(true);
- 
+
     };
     const groupDragBound = (pos) => {
         // console.log("8");
@@ -75,13 +76,16 @@ const PolygonAnnotation = (props) => {
         setMouseOverPoint(false);
     };
     const handlePointDragMove = (e) => {
+        setChangePoint(true)
         console.log("5");
         // setMouseOverPoint(true);
         const stage = e.target.getStage();
         const index = e.target.index - 1;
         // console.log(stage);
 
-        const pos = [(e.target._lastPos.x - state.stageX) / state.stageScale, (e.target._lastPos.y - state.stageY) / state.stageScale];
+        const pos = [Math.round((e.target._lastPos.x - state.stageX) / state.stageScale),
+        Math.round((e.target._lastPos.y - state.stageY) / state.stageScale)
+        ];
         // if (pos[0] < 0) pos[0] = 0;
         // if (pos[1] < 0) pos[1] = 0;
         // if (pos[0] > stage.width()) pos[0] = stage.width();
@@ -89,9 +93,39 @@ const PolygonAnnotation = (props) => {
         let rs = []
         listMap.forEach(map => {
             if (map._id == imap._id) {
-                let p=[...imap.points.slice(0, index), pos, ...imap.points.slice(index + 1)]
+                let p = [...imap.points.slice(0, index), pos, ...imap.points.slice(index + 1)]
                 rs.push({
-                    ...imap, 
+                    ...imap,
+                    points: p,
+                    flattenedPoints: p.concat(!isFinished ? [] : position).reduce((a, b) => a.concat(b), [])
+                })
+            } else {
+                rs.push(map)
+            }
+        });
+        setMaps(rs);
+    };
+    const handlePointDragEnd = (e) => {
+        setChangePoint(false)
+        console.log("5.1");
+        // setMouseOverPoint(true);
+        const stage = e.target.getStage();
+        const index = e.target.index - 1;
+        // console.log(stage);
+
+        const pos = [Math.round((e.target._lastPos.x - state.stageX) / state.stageScale),
+        Math.round((e.target._lastPos.y - state.stageY) / state.stageScale)
+        ];
+        // if (pos[0] < 0) pos[0] = 0;
+        // if (pos[1] < 0) pos[1] = 0;
+        // if (pos[0] > stage.width()) pos[0] = stage.width();
+        // if (pos[1] > stage.height()) pos[1] = stage.height();
+        let rs = []
+        listMap.forEach(map => {
+            if (map._id == imap._id) {
+                let p = [...imap.points.slice(0, index), pos, ...imap.points.slice(index + 1)]
+                rs.push({
+                    ...imap,
                     points: p,
                     flattenedPoints: p.concat(!isFinished ? [] : position).reduce((a, b) => a.concat(b), [])
                 })
@@ -105,16 +139,16 @@ const PolygonAnnotation = (props) => {
     //     setFlattenedPoint(points.concat(isFinished ? [] : position).reduce((a, b) => a.concat(b), []))
     // }, [points]);
     const handleGroupDragEnd = (e) => {
-      
+
         console.log("10");
         //drag end listens other children circles' drag end event
         //...that's, why 'name' attr is added, see in polygon annotation part
-        if (e.target.name() === "polygon" ) {
+        if (e.target.name() === "polygon") {
             let result = [];
             let copyPoints = [...points];
 
             copyPoints.map((point) =>
-                result.push([point[0] + e.target.x(), point[1] + e.target.y()])
+                result.push([Math.round(point[0] + e.target.x()), Math.round(point[1] + e.target.y())])
             );
             e.target.position({ x: 0, y: 0 }); //needs for mouse position otherwise when click undo you will see that mouse click position is not normal:)
 
@@ -130,13 +164,13 @@ const PolygonAnnotation = (props) => {
                 }
             });
             setMaps(rs);
-             setMouseOverPoint(false);
+            setMouseOverPoint(false);
         }
     };
     return (
         <Group
             name="polygon"
-            draggable={!isFinished||edit}
+            draggable={!isFinished || edit}
             onDragStart={handleGroupDragStart}
             onDragEnd={handleGroupDragEnd}
             dragBoundFunc={groupDragBound}
@@ -150,7 +184,7 @@ const PolygonAnnotation = (props) => {
                 closed={true}
                 fill="rgb(140,30,255,0.5)"
             />
-            {(!isFinished||edit)&&points.map((point, index) => {
+            {(!isFinished || edit) && points.map((point, index) => {
                 const x = point[0] - vertexRadius / 2;
                 const y = point[1] - vertexRadius / 2;
                 const startPointAttr =
@@ -176,6 +210,7 @@ const PolygonAnnotation = (props) => {
                         strokeWidth={2}
                         draggable
                         onDragMove={handlePointDragMove}
+                        onDragEnd={handlePointDragEnd}
                         dragBoundFunc={(pos) =>
                             dragBoundFunc(stage?.width(), stage?.height(), vertexRadius, pos)
                         }
