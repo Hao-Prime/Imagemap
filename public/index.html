@@ -1,37 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" href="%PUBLIC_URL%/logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <meta name="description" content="Image Map Generator By VNPT Long An" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.svg" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+    <title>Image Map VNPT Long An</title>
+
+
+    <!-- Maphighlight Script -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <!-- <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/maphilight/1.4.0/jquery.maphilight.min.js"></script> -->
+        <script 
+        type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/imagemapster/1.5.4/jquery.imagemapster.min.js">
+    </script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+
+
+</head>
+
+<body>
+
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+    <!-- <button id="btn-zoom-in">Zoom In</button>
+    <button id="btn-zoom-out">Zoom Out</button> -->
+    <div class="div-review">
+        <div class="review">
+        <img src="http://kcnvinhloc2.com.vn/Content/themes/KCN02/assets/images/bandomoi.jpg" usemap="#image-map"
+            class="maparea" />
+        <map name="image-map" id="image-map">
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+            <!-- <area class="tool" target="" alt="" title="qb" href="" coords="676,908,775,2297,1420,2231,1348,985,1348,985"
+                shape="poly">
+            <area class="tool" target="" alt="" title="xxxxx" href=""
+                coords="279,236,312,512,1563,517,1480,291,929,104,935,104" shape="poly"> -->
+                
+            <area class="tool" target="" alxt="<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>" title='<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>' href="" coords="1602,1250,1281,1392,1501,1562,1519,1778,1749,1769,1804,1714,1804,1714" shape="poly">
+            <area class="tool" target="" alxt="<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>" title='<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>' href="" coords="2299,2054,2033,1944,2005,2004,2185,2270,2217,2348,2331,2298,2423,2229,2437,2073,2437,2073" shape="poly">
+            <area class="tool" target="" alxt="<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>" title='<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>' href="" coords="2625,1774,2423,1462,2217,1444,2084,1655,2175,1802,2492,1949,2768,2137,2928,2229,3401,2018,3438,1797,3332,1669,3181,1568,3181,1568" shape="poly">
+            <area class="tool" target="" alxt="<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>" title='<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>' href="" coords="2581,1046,2493,1233,2559,1426,2741,1553,2967,1586,3358,1498,3385,1294,3352,1222,3352,1222" shape="poly">
+            <area class="tool" target="" axlt="<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>" title='<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>' href="" coords="1622,1873,1380,2011,1347,2259,1573,2568,1771,2584,1920,2468,1787,2077,1787,2077" shape="poly">
+            <area class="tool" target="" axlt="<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>" title='<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>' href="" coords="2796,2287,2355,2287,2168,2402,2129,2584,2355,2727,2757,2793,2900,2689,2922,2590,2922,2590" shape="poly">
+        
+        </map>
+    </div>
+    </div>
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+
+</body>
+<script>
+    $(document).ready(function () {
+        $('.maparea').mapster({
+            // width: '2000px',
+            strokeColor: 'F6A028',
+            strokeWidth: 2,
+            fill: true,
+            fillOpacity: 0.2,
+            fill: true,
+
+        });
+
+        $('.maparea').mapster('resize',1000,1000*$('.maparea').height()/$('.maparea').width());
+        function convert(string) {
+            return "<div>"+string+"</div>"
+        }
+        $(".tool").each(function (index) {
+
+            console.log(typeof (this).title);
+            $(this).tooltip({
+                tooltipClass: "tooltiptext",
+                content: convert((this).title),
+                track: true
+            })
+        });
+
+        function ZoomIn() {
+            $(".maparea").animate({
+                height: '+=500',
+                width: '+=500'
+            }, 1, function () {
+                console.log($(this).width());
+                $(this).mapster('resize', $(this).width(), $(this).height());
+            });
+        }
+
+        function ZoomOut() {
+            $(".maparea").animate({
+                height: '-=500',
+                width: '-=500'
+            }, 1, function () {
+                $(this).mapster('resize', $(this).width(), $(this).height());
+            });
+        }
+
+        // Demo stuff.
+        $('#btn-zoom-in').click(ZoomIn);
+        $('#btn-zoom-out').click(ZoomOut);
+    })
+
+</script>
+
+
 </html>

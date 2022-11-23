@@ -62,17 +62,17 @@ const PolygonAnnotation = (props) => {
     };
     const handleMouseOverPoint = (e) => {
         if (isFinished) return;
-        e.target.scale({ x: 1.5, y: 1.5 });
+        e.target.scale({ x: 1, y: 1 });
     };
     const handleMouseOverStartPoint = (e) => {
         console.log("3");
-        if (!isFinished || points.length < 3) e.target.scale({ x: 1.5, y: 1.5 });
+        if (!isFinished || points.length < 3) e.target.scale({ x: 1, y: 1 });
         else e.target.scale({ x: 3, y: 3 });
         setMouseOverPoint(true);
     };
     const handleMouseOutStartPoint = (e) => {
         console.log("4");
-        e.target.scale({ x: 1, y: 1 });
+        e.target.scale({ x: 0.8, y: 0.8 });
         setMouseOverPoint(false);
     };
     const handlePointDragMove = (e) => {
@@ -179,10 +179,10 @@ const PolygonAnnotation = (props) => {
         >
             <Line
                 points={imap.flattenedPoints}
-                stroke="#00F1FF"
+                stroke="#00F1FF60"
                 strokeWidth={3}
                 closed={true}
-                fill="rgb(140,30,255,0.5)"
+                fill={imap.color+"80"}
             />
             {(!isFinished || edit) && points.map((point, index) => {
                 const x = point[0] - vertexRadius / 2;
@@ -205,8 +205,8 @@ const PolygonAnnotation = (props) => {
                         x={x}
                         y={y}
                         radius={vertexRadius}
-                        fill="#FF019A"
-                        stroke="#00F1FF"
+                        fill="#FF019A90"
+                        stroke="#00F1FF90"
                         strokeWidth={2}
                         draggable
                         onDragMove={handlePointDragMove}

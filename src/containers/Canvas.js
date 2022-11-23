@@ -3,45 +3,43 @@ import PolygonAnnotation from "components/PolygonAnnotation";
 import { Stage, Layer, Image } from "react-konva";
 import Button from "components/Button";
 import ExportModal from "components/ExportModal";
-
-
+import ReviewModal from "components/ReviewModal";
+const videoSource = window.location.href + "default.jpg";
 
 const Canvas = () => {
-    const [image, setImage] = useState();
+
     const imageRef = useRef(null);
     const dataRef = useRef(null);
-    const [maps, setMaps] = useState([{ _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", target: "", title: "" }]);
+    const [maps, setMaps] = useState([{ _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "",color: "#8c1eff", target: "", title: "" }]);
     const [history, setHistory] = useState([maps]);
     const [size, setSize] = useState({});
-    const [changePoint, setChangePoint] = useState(false);
-    const [flattenedPoints, setFlattenedPoints] = useState();
+    const [changePoint, setChangePoint] = useState(true);
     const [position, setPosition] = useState([0, 0]);
     const [isMouseOverPoint, setMouseOverPoint] = useState(false);
-    const [displayModal, setDisplayModal] = useState(false);
-
+    const [displayModalExport, setDisplayModalExport] = useState(false);
+    const [displayModalReview, setDisplayModalReview] = useState(false);
     const [picture, setPicture] = useState(null);
     // const [isFinished, setPolyComplete] = useState(false);
     const videoElement = useMemo(() => {
         const element = new window.Image();
-        // element.width = 650;
-        // element.height = 302;
-
         if (picture != null) {
             element.src = picture;
-        } else element.src = window.location.href + "default.jpg";
-
-        console.log(  element.src);
+            setChangePoint(false)
+        } else {
+            element.src = ""
+            setChangePoint(true)
+        }
+        console.log(element);
         return element;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [picture]); //it may come from redux so it may be dependency that's why I left it as dependecny...
+    }, [picture, videoSource]); //it may come from redux so it may be dependency that's why I left it as dependecny...
 
     useEffect(() => {
-        
+
         setSize({
             width: videoElement.width,
             height: videoElement.height,
         });
-        setImage(videoElement);
         imageRef.current = videoElement;
         setState({
             stageScale: 1000 / videoElement.width,
@@ -67,12 +65,11 @@ const Canvas = () => {
             } else return
         });
 
-
-        if (imap == undefined || isMouseOverPoint) {
+        //không tìm thấy map , đang ở nút ,chưa import hình, chưa đc chọn edit
+        if (imap == undefined || isMouseOverPoint || changePoint || imap.isFinished) {
             return
         }
         console.log("1");
-        if (imap.isFinished) return;
         if (isMouseOverPoint && imap.points.length >= 3) {
             let rs = []
             maps.forEach(map => {
@@ -112,10 +109,21 @@ const Canvas = () => {
         setPosition(mousePos);
     };
 
-
+    //lịch sử
     useEffect(() => {
         if (!history.includes(maps) && !changePoint) {
-            setHistory([...history, maps])
+            if(maps.length==0){
+                return
+            }
+            if(maps[maps.length-1].changeHistory==false){
+                
+                maps[maps.length-1].changeHistory=true
+                
+                
+            }else {
+                setHistory([...history, maps])
+            }
+            
         }
     }, [maps]);
     const undo = () => {
@@ -130,7 +138,7 @@ const Canvas = () => {
         maps.forEach(map => {
             rs.push({ ...map, isFinished: true, edit: false })
         });
-        setMaps([...rs, { _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", target: "", title: "" }])
+        setMaps([...rs, { _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", color: "#8c1eff", target: "", title: "" }])
     };
     const edit = (_id) => {
 
@@ -154,11 +162,14 @@ const Canvas = () => {
         setMaps(rs)
     };
     const reset = () => {
-        setMaps([{ _id: "1111", points: [], flattenedPoints: [], isFinished: false, edit: true , link: "", target: "", title: ""}]);
+        setMaps([{ _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", color: "#8c1eff", target: "", title: "" }]);
         // setPolyComplete(false);
     };
     const exportMap = () => {
-        setDisplayModal(true)
+        setDisplayModalExport(true)
+    };
+    const review = () => {
+        setDisplayModalReview(true)
     };
     const [state, setState] = useState({
         stageScale: 0.6,
@@ -184,7 +195,7 @@ const Canvas = () => {
         };
 
         const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-        if (newScale > (1000 / videoElement.width)) {
+        if (newScale > ((1000 / videoElement.width)-0.02)) {
             setState({
                 stageScale: newScale,
                 stageX: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
@@ -193,7 +204,7 @@ const Canvas = () => {
             });
         } else {
             setState({
-                stageScale: 1000 / videoElement.width,
+                stageScale: ((1000 / videoElement.width)-0.02),
                 stageX: 0,
                 stageY: 0,
                 height: state.height,
@@ -215,25 +226,28 @@ const Canvas = () => {
                     if (e.target.value != "null") {
                         newMap.target = e.target.value
                     }
-
-                }
+                }else if (arr == "color") {
+                    newMap.color = e.target.value
+                    newMap.changeHistory=false
+                } 
                 rs.push(newMap)
             } else {
+                if (arr == "color") {
+                    map.changeHistory=false
+                }
                 rs.push(map)
             }
         });
+       
         setMaps(rs);
         // console.log(e.target.value);
     }
     function saveFile(file) {
-
+        
         getBase64(file).then(base64 => {
             setPicture(base64);
 
         });
-
-
-
     }
     const getBase64 = (file) => {
         return new Promise((resolve, reject) => {
@@ -247,35 +261,41 @@ const Canvas = () => {
     return (
         <>
 
-            <div>
-                {displayModal && <ExportModal maps={maps} setDisplay={setDisplayModal} />}
-                <div  className="wrapperStyle">
-                    {picture==null&&<input type="file" className="form-control form-control-lg input-picture" name="tenDA"
-                            onChange={(e) => { saveFile(e.target.files[0]) }} placeholder=""
-                            accept=".jpg, .jpeg, .png,"
-                        />}
-                    </div>
-
+            <div >
+                {displayModalExport && <ExportModal maps={maps} setDisplay={setDisplayModalExport} />}
+                {displayModalReview && <ReviewModal maps={maps} setDisplay={setDisplayModalReview} />}
+                <div className="wrapperStyle-header ">
+                    <h3 className="text-anim"><b>IMAGE MAP VNPT LONG AN</b></h3>
+                </div>
                 <div className="wrapperStyle">
-                    
-                    <div className="columnStyle">
+                    {picture == null && <input type="file" className="custom-file-input"
+                        onChange={(e) => { saveFile(e.target.files[0]) }}
+                        accept=".jpg, .jpeg, .png,"
+                    />}
+                </div>
+                {/* layer */}
+                <div className="wrapperStyle">
+                
+                    <div className= {videoElement.src==window.location.href?"columnStyle centered":"columnStyle"} >
+                        {/* <div className=""></div> */}
                         <Stage
                             width={1000}
                             height={state.height}
                             onMouseMove={handleMouseMove}
                             onMouseUp={handleMouseDown}
                             onWheel={handleWheel}
-                            
+                          
                             scaleX={state.stageScale}
                             scaleY={state.stageScale}
                             x={state.stageX}
                             y={state.stageY}
 
                         >
+                        
                             <Layer>
                                 <Image
                                     ref={imageRef}
-                                    image={image}
+                                    image={videoElement}
                                     x={0}
                                     y={0}
                                     width={size.width}
@@ -302,7 +322,10 @@ const Canvas = () => {
 
                     </div>
 
+
+
                 </div>
+                {/* button */}
                 <div
                     style={{
                         display: "flex",
@@ -311,12 +334,14 @@ const Canvas = () => {
                     }}
                 >
                     {/* <Button name="Undo" onClick={undo} /> */}
-                    <Button name="Add" onClick={addMap} />
-                    <Button name="Undo" onClick={undo} />
-                    <Button name="Export" onClick={exportMap} />
+                    <button className="btn-grad" onClick={addMap} >Add</button>
+                    <button className="btn-grad" onClick={undo} >Undo</button>
+                    <button className="btn-grad" onClick={review}>Review</button>
+                    <button className="btn-grad" onClick={exportMap}>Export</button>
                     &emsp;|&emsp;
-                    <Button name="RESET" onClick={reset} />
+                    <button className="btn-grad-reset" onClick={reset}>RESET</button>
                 </div>
+                {/* list */}
                 <div
 
                     style={{
@@ -338,6 +363,7 @@ const Canvas = () => {
                             <thead>
                                 <tr>
                                     <th>Active</th>
+                                    <th>Color</th>
                                     <th>Shape</th>
                                     <th>Link</th>
                                     <th>Title</th>
@@ -349,18 +375,19 @@ const Canvas = () => {
                                 {sortMaps().map((imap, index) =>
                                     <tr key={imap._id}>
                                         <td> <button className={!imap.isFinished ? "btn btn-primary" : "btn btn-outline-primary"} onClick={(e) => edit(imap._id)} >{maps.length - (index)}</button></td>
+                                        <td> <input type="color" className="form-control form-control-color" value={imap.color} onChange={(e)=>{onChange(e, imap._id, "color");}}/></td>
                                         <td>
-                                            <select className="form-select" defaultValue={"poly"} aria-label="Default select example">
+                                            <select className="form-control" defaultValue={"poly"} aria-label="Default select example">
                                                 {/* <option selected value="">...</option> */}
                                                 <option value="poly">Poly</option>
                                                 {/* <option value="2">Two</option>
                                             <option value="3">Three</option> */}
                                             </select>
                                         </td>
-                                        <td> <input type="text" defaultValue={imap.link} className="form-control" onChange={(e) => { onChange(e, imap._id, "link") }} /></td>
-                                        <td> <input type="text" defaultValue={imap.title} className="form-control" onChange={(e) => { onChange(e, imap._id, "title") }} /></td>
+                                        <td> <input type="text" defaultValue={imap.link} placeholder="link" className="form-control" onChange={(e) => { onChange(e, imap._id, "link") }} /></td>
+                                        <td> <input type="text" defaultValue={imap.title} placeholder="title" className="form-control" onChange={(e) => { onChange(e, imap._id, "title") }} /></td>
                                         <td>
-                                            <select className="form-select" defaultValue={imap.target=""?"null":imap.target} aria-label="Default select example" onChange={(e) => { onChange(e, imap._id, "target") }}>
+                                            <select className="form-control" defaultValue={imap.target = "" ? "null" : imap.target} aria-label="Default select example" onChange={(e) => { onChange(e, imap._id, "target") }}>
                                                 <option value="null">...</option>
                                                 <option value="_blank">_blank</option>
                                                 <option value="_parent">_parent</option>
@@ -385,6 +412,9 @@ const Canvas = () => {
                         // .replaceAll('[',"").replaceAll("]","")
                     }</pre> */}
                     </div>
+                </div>
+                <div className="wrapperStyle-footer">
+                    <p>Copyright © VNPT Long An 2022</p>
                 </div>
             </div>
         </>

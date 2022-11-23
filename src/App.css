@@ -59,9 +59,9 @@ body * {
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  background-color: rgb(232, 232, 232);
-
-  border: 2px solid rgb(109, 109, 109);
+  background: #e8e8e8;
+  border: 2px solid #939393;
+  padding: 0px !important;
 }
 
 .wrapperStyle {
@@ -70,7 +70,210 @@ body * {
   margin-top: 8px;
 }
 
+.wrapperStyle-header {
+  display: flex;
+  color: rgb(38, 0, 153);
+  justify-content: center;
+  padding: 8px 10px 2px 10px;
+  margin: auto;
+  /* background: linear-gradient(90deg,#000000be,#4444fcb9 35%,#18dcffc0); */
+  background-color: #323232;
+
+}
+
+.wrapperStyle-footer {
+  display: flex;
+  color: #ffffff;
+  justify-content: center;
+  padding: 5px 10px 5px 10px;
+  margin: 30px auto 0px auto;
+  text-align: center;
+  /* background: linear-gradient(90deg,#000000be,#4444fcb9 35%,#18dcffc0); */
+  background-color: #323232;
+
+}
+
+p {
+  margin: 0px;
+}
+
 .input-picture {
   width: 1000px;
+
+}
+
+.custom-file-input {
+  width: 198px;
+  color: transparent;
+}
+
+.custom-file-input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+.custom-file-input::before {
+  content: 'Select image from my PC';
+  display: inline-block;
+  background: linear-gradient(90deg, #2014ffbe, #4444fcb9 35%, #0cd4f7c0);
+
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  color: white;
+  cursor: pointer;
+
+
+}
+
+.custom-file-input:hover::before {
+  border-color: black;
+}
+
+.custom-file-input:active::before {
+  background: linear-gradient(90deg, #1004f7be, #2424f0b9 35%, #0bd8fcc0);
+}
+
+.btn-edit {
+  margin: 8px;
+  padding: 6px 15px;
+  color: white;
+  background: linear-gradient(90deg, #2014ffbe, #4444fcb9 35%, #18dcffc0);
+  border: none;
+  border-radius: 0.3rem;
+}
+
+
+.btn-grad {
+  background-image: linear-gradient(to right, #4776E6 0%, #8E54E9 51%, #4776E6 100%);
+  margin: 8px;
+  padding: 6px 15px;
+  border: none;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+
+  border-radius: 5px;
+  display: block;
+}
+
+.btn-grad:hover {
+  background-position: right center;
+  /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+.btn-grad-reset {
+  background-image: linear-gradient(to right, #FF512F 0%, #F09819 51%, #FF512F 100%);
+  margin: 8px;
+  padding: 6px 15px;
+  border: none;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+
+  border-radius: 5px;
+  display: block;
+}
+
+.btn-grad-reset:hover {
+  background-position: right center;
+  /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+.colors {
+  /* height: 100vh; */
+
+  background-image: linear-gradient(80deg,
+      tomato,
+      tomato,
+      gold,
+      royalblue,
+      lime,
+      royalblue,
+      gold,
+      tomato,
+      tomato);
+  background-size: 800%;
+  animation: colors 10s linear infinite;
+}
+
+@keyframes colors {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 100% 0;
+  }
+}
+
+.text-anim {
+  background-image: linear-gradient(80deg,
+      tomato,
+      tomato,
+      gold,
+      royalblue,
+      lime,
+      royalblue,
+      gold,
+      tomato,
+      tomato);
+  background-blend-mode: color-dodge, normal;
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: colors 10s linear infinite;
+}
+
+@keyframes gradient-anim {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+
+.centered{
+
+  background-color:#BFDFEC;
+    background-repeat:repeat-x;
+ background-image:url("https://i.stack.imgur.com/b7z29.png");
+  animation: movement 10s linear infinite; 
+}
+
+@keyframes movement{
+  0% {
+    background-position:0px 0px;
+  }
+  100%{
+    background-position:560px 0px;
+  }
+}
+/* maphightlight */
+.div-review{
+  display: flex;
+ 
+  justify-content: center;
+  padding: 10px 0px;
+  margin: auto;
   
+}
+.review{
+
+  border: 1px solid gray;
+  
+}
+.tooltiptext{
+  color: red;
 }

@@ -3,14 +3,8 @@ import React from "react";
 const Button = ({ name, onClick }) => {
   return (
     <button
-      style={{
-        margin: 8,
-        padding: "7px 16px",
-        color: "white",
-        backgroundColor: "#FF019A",
-        border: "none",
-        borderRadius: ".4rem",
-      }}
+      className="btn-grad"
+    
       onClick={onClick}
     >
       {name}
