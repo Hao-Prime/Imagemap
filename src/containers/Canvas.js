@@ -4,15 +4,17 @@ import { Stage, Layer, Image } from "react-konva";
 import Button from "components/Button";
 import ExportModal from "components/ExportModal";
 import ReviewModal from "components/ReviewModal";
+
 const videoSource = window.location.href + "default.jpg";
 
 const Canvas = () => {
 
     const imageRef = useRef(null);
     const dataRef = useRef(null);
-    const [maps, setMaps] = useState([{ _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "",color: "#8c1eff", target: "", title: "" }]);
+    const [maps, setMaps] = useState([{ _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", color: "#8c1eff", target: "", title: "" }]);
     const [history, setHistory] = useState([maps]);
     const [size, setSize] = useState({});
+    const [colorDefault, setColorDefault] = useState("#8c1eff");
     const [changePoint, setChangePoint] = useState(true);
     const [position, setPosition] = useState([0, 0]);
     const [isMouseOverPoint, setMouseOverPoint] = useState(false);
@@ -29,7 +31,7 @@ const Canvas = () => {
             element.src = ""
             setChangePoint(true)
         }
-        console.log(element);
+
         return element;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [picture, videoSource]); //it may come from redux so it may be dependency that's why I left it as dependecny...
@@ -112,18 +114,18 @@ const Canvas = () => {
     //lịch sử
     useEffect(() => {
         if (!history.includes(maps) && !changePoint) {
-            if(maps.length==0){
+            if (maps.length == 0) {
                 return
             }
-            if(maps[maps.length-1].changeHistory==false){
-                
-                maps[maps.length-1].changeHistory=true
-                
-                
-            }else {
+            if (maps[maps.length - 1].changeHistory == false) {
+
+                maps[maps.length - 1].changeHistory = true
+
+
+            } else {
                 setHistory([...history, maps])
             }
-            
+
         }
     }, [maps]);
     const undo = () => {
@@ -138,7 +140,7 @@ const Canvas = () => {
         maps.forEach(map => {
             rs.push({ ...map, isFinished: true, edit: false })
         });
-        setMaps([...rs, { _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", color: "#8c1eff", target: "", title: "" }])
+        setMaps([...rs, { _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", color: colorDefault, target: "", title: "" }])
     };
     const edit = (_id) => {
 
@@ -162,7 +164,7 @@ const Canvas = () => {
         setMaps(rs)
     };
     const reset = () => {
-        setMaps([{ _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", color: "#8c1eff", target: "", title: "" }]);
+        setMaps([{ _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", color: colorDefault, target: "", title: "" }]);
         // setPolyComplete(false);
     };
     const exportMap = () => {
@@ -195,7 +197,7 @@ const Canvas = () => {
         };
 
         const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-        if (newScale > ((1000 / videoElement.width)-0.02)) {
+        if (newScale > ((1000 / videoElement.width))) {
             setState({
                 stageScale: newScale,
                 stageX: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
@@ -204,7 +206,7 @@ const Canvas = () => {
             });
         } else {
             setState({
-                stageScale: ((1000 / videoElement.width)-0.02),
+                stageScale: ((1000 / videoElement.width) ),
                 stageX: 0,
                 stageY: 0,
                 height: state.height,
@@ -217,7 +219,6 @@ const Canvas = () => {
         maps.forEach(map => {
             if (map._id == id) {
                 let newMap = map;
-                console.log(e.target.value);
                 if (arr == "link") {
                     newMap.link = e.target.value
                 } else if (arr == "title") {
@@ -226,24 +227,25 @@ const Canvas = () => {
                     if (e.target.value != "null") {
                         newMap.target = e.target.value
                     }
-                }else if (arr == "color") {
+                } else if (arr == "color") {
                     newMap.color = e.target.value
-                    newMap.changeHistory=false
-                } 
+                    setColorDefault(e.target.value)
+                    newMap.changeHistory = false
+                }
                 rs.push(newMap)
             } else {
                 if (arr == "color") {
-                    map.changeHistory=false
+                    map.changeHistory = false
                 }
                 rs.push(map)
             }
         });
-       
+
         setMaps(rs);
         // console.log(e.target.value);
     }
     function saveFile(file) {
-        
+
         getBase64(file).then(base64 => {
             setPicture(base64);
 
@@ -262,8 +264,9 @@ const Canvas = () => {
         <>
 
             <div >
+            
                 {displayModalExport && <ExportModal maps={maps} setDisplay={setDisplayModalExport} />}
-                {displayModalReview && <ReviewModal maps={maps} setDisplay={setDisplayModalReview} />}
+                {displayModalReview && <ReviewModal maps={maps} setDisplay={setDisplayModalReview} picture={picture} />}
                 <div className="wrapperStyle-header ">
                     <h3 className="text-anim"><b>IMAGE MAP VNPT LONG AN</b></h3>
                 </div>
@@ -275,8 +278,8 @@ const Canvas = () => {
                 </div>
                 {/* layer */}
                 <div className="wrapperStyle">
-                
-                    <div className= {videoElement.src==window.location.href?"columnStyle centered":"columnStyle"} >
+
+                    <div className={videoElement.src == window.location.href ? "columnStyle centered" : "columnStyle"} >
                         {/* <div className=""></div> */}
                         <Stage
                             width={1000}
@@ -284,14 +287,14 @@ const Canvas = () => {
                             onMouseMove={handleMouseMove}
                             onMouseUp={handleMouseDown}
                             onWheel={handleWheel}
-                          
+
                             scaleX={state.stageScale}
                             scaleY={state.stageScale}
                             x={state.stageX}
                             y={state.stageY}
 
                         >
-                        
+
                             <Layer>
                                 <Image
                                     ref={imageRef}
@@ -375,7 +378,7 @@ const Canvas = () => {
                                 {sortMaps().map((imap, index) =>
                                     <tr key={imap._id}>
                                         <td> <button className={!imap.isFinished ? "btn btn-primary" : "btn btn-outline-primary"} onClick={(e) => edit(imap._id)} >{maps.length - (index)}</button></td>
-                                        <td> <input type="color" className="form-control form-control-color" value={imap.color} onChange={(e)=>{onChange(e, imap._id, "color");}}/></td>
+                                        <td> <input type="color" className="form-control form-control-color" value={imap.color} onChange={(e) => { onChange(e, imap._id, "color"); }} /></td>
                                         <td>
                                             <select className="form-control" defaultValue={"poly"} aria-label="Default select example">
                                                 {/* <option selected value="">...</option> */}
