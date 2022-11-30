@@ -396,8 +396,9 @@ p {
 }
 
 .tooltiptext {
-  background-color: white;
-  /* border: 1px solid #cdcdcd; */
+  background: white;
+  border: unset;
+  border-radius: 10px;
   margin-top: 50px !important;
   min-width: 250px;
   min-height: 100px;
@@ -406,10 +407,10 @@ p {
 .tooltiptext::after {
   content: "";
   position: absolute;
-  border-left: 1px solid #e3f2fd;
-  border-top: 1px solid #e3f2fd;
+  border-left: 1px solid #f6fbff;
+  border-top: 1px solid #f4f9fd;
   left: 15px;
-  top: -7px;
+  top: -5px;
   width: 11px;
   height: 11px;
   background: #ffffff;

@@ -9,6 +9,7 @@ import ExportModal from "components/ExportModal";
 import ReviewModal from "components/ReviewModal";
 import SaveModal from "components/SaveModal";
 import { async } from "@firebase/util";
+import EditTitleModal from "components/EditTitleModal";
 
 var videoSource = window.location.href + "default.jpg";
 
@@ -17,6 +18,7 @@ const Canvas = () => {
     const imageRef = useRef(null);
     const dataRef = useRef(null);
     const [maps, setMaps] = useState([{ _id: (new Date()).getTime() + "", points: [], flattenedPoints: [], isFinished: false, edit: true, link: "", color: "#8c1eff", target: "", title: "" }]);
+    const [mapEdit, setMapEdit] = useState();
     const [history, setHistory] = useState([maps]);
     const [size, setSize] = useState({});
     const [colorDefault, setColorDefault] = useState("#8c1eff");
@@ -27,6 +29,7 @@ const Canvas = () => {
     const [displayModalExport, setDisplayModalExport] = useState(false);
     const [displayModalReview, setDisplayModalReview] = useState(false);
     const [displayModalSave, setDisplayModalSave] = useState(false);
+    const [displayModalEdit, setDisplayModalEdit] = useState(false);
     const [picture, setPicture] = useState("");
     const location = useLocation();
     const [idSave, setIDSave] = useState(new URLSearchParams(location.search).get("id"));
@@ -345,7 +348,7 @@ const Canvas = () => {
                 if (arr == "link") {
                     newMap.link = e.target.value
                 } else if (arr == "title") {
-                    newMap.title = e.target.value
+                    newMap.title = e
                 } else if (arr == "target") {
                     if (e.target.value != "null") {
                         newMap.target = e.target.value
@@ -390,6 +393,7 @@ const Canvas = () => {
 
                 {displayModalExport && <ExportModal maps={maps} setDisplay={setDisplayModalExport} />}
                 {displayModalReview && <ReviewModal maps={maps} setDisplay={setDisplayModalReview} picture={picture} />}
+                {displayModalEdit && <EditTitleModal map={mapEdit} onChange={onChange} setDisplay={setDisplayModalEdit} />}
                 {displayModalSave && <SaveModal setDisplay={setDisplayModalSave} idSave={idSave} progresspercent={progresspercent}/>}
                 <div className="col-12 wrapperStyle-header row justify-content-md-center">
                     <h3 className="text-anim"><b>IMAGE MAP VNPT LONG AN</b></h3>
@@ -505,7 +509,7 @@ const Canvas = () => {
                                 </thead>
                                 <tbody>
                                     {sortMaps().map((imap, index) =>
-                                        <tr key={imap._id} className={!imap.isFinished &&"tr-select"}>
+                                        <tr key={imap._id} className={!imap.isFinished?"tr-select":""}>
                                             <td> <button className={!imap.isFinished ? "btn btn-stt btn-primary" : "btn btn-stt btn-outline-primary"} onClick={(e) => edit(imap._id)} >{maps.length - (index)}</button></td>
                                             <td> <input type="color" className="form-control form-control-color" value={imap.color} onChange={(e) => { onChange(e, imap._id, "color"); }} /></td>
                                             <td>
@@ -517,7 +521,7 @@ const Canvas = () => {
                                                 </select>
                                             </td>
                                             <td> <input type="text" defaultValue={imap.link} placeholder="link" className="form-control" onChange={(e) => { onChange(e, imap._id, "link") }} /></td>
-                                            <td> <input type="text" defaultValue={imap.title} placeholder="title" className="form-control" onChange={(e) => { onChange(e, imap._id, "title") }} /></td>
+                                            <td> <input type="text" defaultValue={imap.title} placeholder="title" className="form-control" onClick={(e) => { setMapEdit(imap);setDisplayModalEdit(true) }} /></td>
                                             <td>
                                                 <select className="form-control" defaultValue={imap.target = "" ? "null" : imap.target} aria-label="Default select example" onChange={(e) => { onChange(e, imap._id, "target") }}>
                                                     <option value="null">...</option>

@@ -27,9 +27,9 @@ RUN npm run build
 # # CMD [ "npm", "start" ]
 # CMD serve -s build -p 3002
 
-# docker build -t haohi/image-map:0.0.2 .
-# docker pull haohi/image-map:0.0.2 
-# docker run -d -p 3003:3003 haohi/image-map:0.0.2
+# docker build -t haohi/image-map:0.0.3 .
+# docker pull haohi/image-map:0.0.3 
+# docker run -d -p 3003:3003 haohi/image-map:0.0.3
 #Test thử
 FROM node:14.17.5-alpine
 COPY --from=build /app/build ./build
