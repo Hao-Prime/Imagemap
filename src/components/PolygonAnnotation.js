@@ -9,11 +9,13 @@ import { minMax, dragBoundFunc } from "utils";
  *
  */
 const PolygonAnnotation = (props) => {
+    const [hoverPointer, setHoverPointer] = useState(false); 
     const [minMaxX, setMinMaxX] = useState([0, 0]); //min and max in x axis
     const [minMaxY, setMinMaxY] = useState([0, 0]); //min and max in y axis
     const [flattenedPoint, setFlattenedPoint] = useState(); //min and max in x axis
     const {
         imap,
+        setPointDelete,
         flattenedPoints,
         isFinished,
         points,
@@ -32,16 +34,20 @@ const PolygonAnnotation = (props) => {
     const handleGroupMouseOver = (e) => {
         // console.log("8");
         if (isFinished) return;
-        e.target.getStage().container().style.cursor = "move";
+        if(!hoverPointer) {
+            e.target.getStage().container().style.cursor = "move";
+        }else {e.target.getStage().container().style.cursor = "grab";
+
+        }
         setStage(e.target.getStage());
     };
     const handleGroupMouseOut = (e) => {
         // console.log("9");
-        e.target.getStage().container().style.cursor = "default";
+        e.target.getStage().container().style.cursor = "crosshair";
     };
 
     const handleGroupDragStart = (e) => {
-        // console.log("7");
+        console.log("7");
         // let arrX = points?.map((p) => p[0]);
         // let arrY = points?.map((p) => p[1]);
         // setMinMaxX(minMax(arrX));
@@ -61,19 +67,28 @@ const PolygonAnnotation = (props) => {
         // return { x, y };
     };
     const handleMouseOverPoint = (e) => {
+        console.log("3");
         if (isFinished) return;
-        e.target.scale({ x: 1, y: 1 });
+        let scale=e.target.attrs.scaleX+0.3
+        e.target.scale({ x: scale, y: scale });
+        setHoverPointer(true)
+        setPointDelete([e.target.attrs.x,e.target.attrs.y])
+        
     };
     const handleMouseOverStartPoint = (e) => {
-        console.log("3");
-        if (!isFinished || points.length < 3) e.target.scale({ x: 1, y: 1 });
-        else e.target.scale({ x: 3, y: 3 });
+        // let scale=e.target.attrs.scaleX+0.3
+        console.log("7.1");
+        // if (!isFinished || points.length < 3) e.target.scale({ x: scale, y: scale });
+        setHoverPointer(true)
         setMouseOverPoint(true);
     };
     const handleMouseOutStartPoint = (e) => {
         console.log("4");
-        e.target.scale({ x: 0.8, y: 0.8 });
+        let scale=state.scale
+        e.target.scale({ x: scale, y: scale});
         setMouseOverPoint(false);
+        setHoverPointer(false)
+        setPointDelete(null)
     };
     const handlePointDragMove = (e) => {
         setChangePoint(true)
@@ -82,7 +97,6 @@ const PolygonAnnotation = (props) => {
         const stage = e.target.getStage();
         const index = e.target.index - 1;
         // console.log(stage);
-
         const pos = [Math.round((e.target._lastPos.x - state.stageX) / state.stageScale),
         Math.round((e.target._lastPos.y - state.stageY) / state.stageScale)
         ];
@@ -202,9 +216,11 @@ const PolygonAnnotation = (props) => {
                 return (
                     <Circle
                         key={index}
-                        x={x}
-                        y={y}
+                        x={x+3}
+                        y={y+3}
                         radius={vertexRadius}
+                        scaleX={state.scale}
+                        scaleY={state.scale}
                         fill="#FF019A90"
                         stroke="#00F1FF90"
                         strokeWidth={2}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Modal.css"
 import { Helmet, HelmetProvider } from 'react-helmet-async'
+import { Fragment } from "react/cjs/react.production.min";
 const ReviewModal = ({ maps, setDisplay, picture }) => {
     const [exportMap, setExportMap] = useState("");
     useEffect(() => {
@@ -10,8 +11,8 @@ const ReviewModal = ({ maps, setDisplay, picture }) => {
     return (
         <div className="modal" id="exampleModal" aria-labelledby="exampleModalLabel" aria-hidden="true" style={{ display: "block", backgroundColor: "rgb(217 217 217 / 70%)" }}>
             <HelmetProvider>
-                    <Helmet><script src='./mapster.js' /></Helmet>
-                </HelmetProvider>
+                <Helmet><script src='./mapster.js' /></Helmet>
+            </HelmetProvider>
             <div className="modal-dialog modal-md" style={{ maxWidth: "1150px" }}>
                 <div className="modal-content">
                     <div className="modal-header">
@@ -31,13 +32,17 @@ const ReviewModal = ({ maps, setDisplay, picture }) => {
                             <map name="image-map" id="image-map">
                                 {
                                     maps.map(map =>
-                                        <area key={map._id}
-                                            className="tool" 
-                                            target=""
-                                            href=''
-                                            data-key={'{"fillColor": "'+map.color?.replace("#","")+'","strokeColor": "'+map.color?.replace("#","")+'"}'}
-                                            title={map.title}
-                                            coords={map.flattenedPoints} shape='poly'  />
+                                        <Fragment key={map._id}>
+                                            {map.flattenedPoints.length>0&&
+                                            <area 
+                                                className="tool"
+                                                target=""
+                                                href=''
+                                                data-key={'{"fillColor": "' + map.color?.replace("#", "") + '","strokeColor": "' + map.color?.replace("#", "") + '"}'}
+                                                title={map.title}
+                                                coords={map.flattenedPoints} shape='poly' />}
+                                        </Fragment>
+
                                     )
                                 }
                                 {/* <area className="tool" target=""
@@ -66,7 +71,7 @@ const ReviewModal = ({ maps, setDisplay, picture }) => {
                                     title='<p><b>This text is bold</b></p> <p><i>This text is italic</i></p> <p>This is<sub> subscript</sub> and <sup>superscript</sup></p>'
                                     href='' coords='2402,1548,2469,1520,2537,1676,2471,1706,2471,1706' shape='poly' /> */}
                             </map>
-                        
+
                         </div>
                     </div>
                     <div className="modal-footer">

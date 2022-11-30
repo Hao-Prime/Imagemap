@@ -1,29 +1,3 @@
-/* width */
-::-webkit-scrollbar {
-  width: 9px;
-  height: 9px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.723);
-  border-radius: 10px;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: rgba(120, 120, 120, 0.786);
-  border-radius: 10px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #838589;
-}
-
-::-webkit-scrollbar-track:hover .card-body-phantrang {
-  background: #0349fb;
-}
 
 .table-drag-select td.cell-selected {
   background-color: #5e91ff;
@@ -215,4 +189,7 @@ font-size: 13px !important;
   background: unset;
   border: unset;
   margin-right: 5px !important;
+}
+.modal-save .modal-dialog{
+  margin: 200px auto !important;
 }
